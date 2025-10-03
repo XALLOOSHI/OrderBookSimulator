@@ -1,0 +1,43 @@
+#define CATCH_CONFIG_MAIN
+#include <catch2/catch.hpp>
+#include "../src/order_book_sim.cpp"  // Include your implementation
+
+TEST_CASE("OrderBook basic limit order insertion") {
+    OrderBook ob;
+
+    Order o1(1, Side::BUY, Type::LIMIT, 100.0, 50, 0);
+    auto trades1 = ob.process_order(o1);
+
+    REQUIRE(trades1.empty()); // No trades should happen yet
+
+    Order o2(2, Side::SELL, Type::LIMIT, 101.0, 30, 0);
+    auto trades2 = ob.process_order(o2);
+
+    REQUIRE(trades2.empty()); // Prices do not match, no trades
+}
+
+TEST_CASE("OrderBook matching orders") {
+    OrderBook ob;
+
+    Order buy(1, Side::BUY, Type::LIMIT, 100.0, 50, 0);
+    Order sell(2, Side::SELL, Type::LIMIT, 100.0, 30, 0);
+
+    ob.process_order(buy);
+    auto trades = ob.process_order(sell);
+
+    REQUIRE(trades.size() == 1);
+    REQUIRE(trades[0].qty == 30);
+    REQUIRE(trades[0].price == 100.0);
+}
+
+TEST_CASE("IOC order cancels remaining") {
+    OrderBook ob;
+
+    Order sell(1, Side::SELL, Type::LIMIT, 105.0, 50, 0);
+    ob.process_order(sell);
+
+    Order ioc_buy(2, Side::BUY, Type::IOC, 100.0, 50, 0);
+    auto trades = ob.process_order(ioc_buy);
+
+    REQUIRE(trades.empty()); // IOC should not match because price too low
+}

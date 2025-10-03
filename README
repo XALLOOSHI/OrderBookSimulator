@@ -1,0 +1,46 @@
+# Order Book Simulator
+
+A high-performance, multi-threaded **order book simulator** written in C++ that models real-time trading. This program generates random buy and sell orders, processes them against an order book, and executes trades automatically when prices match.
+
+---
+
+## Features
+
+- **Random order generation**  
+  Multiple threads generate BUY and SELL orders with random prices, quantities, and types:  
+  - **LIMIT**: added to the order book if unmatched  
+  - **MARKET**: executes immediately at the best available price  
+  - **IOC (Immediate or Cancel)**: executes immediately, remaining unmatched quantity is canceled  
+
+- **Multi-threaded order generation**  
+  Simulates many traders submitting orders concurrently.  
+
+- **Thread-safe order queue**  
+  Orders are pushed into a `TSQueue` for safe processing by the main thread.  
+
+- **Automatic trade execution**  
+  Orders are matched according to price and time priority:  
+  - BUY orders match the lowest available SELL orders  
+  - SELL orders match the highest available BUY orders  
+  - Trades record buyer ID, seller ID, price, quantity, and timestamp  
+
+- **Order book maintenance**  
+  Keeps track of bids (descending) and asks (ascending).  
+  Prints top N levels of the order book after processing.
+
+---
+
+## Requirements
+
+- **C++17 or later**  
+- **GCC / MinGW** (for Windows) or any modern compiler supporting C++17  
+- **Thread support** (`-pthread` flag on GCC)  
+
+---
+
+## How to run
+
+```./order_book_sim.exe
+
+
+
